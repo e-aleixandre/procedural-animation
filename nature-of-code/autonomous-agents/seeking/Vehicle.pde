@@ -36,6 +36,7 @@ class Vehicle {
         applyForce(steer);
     }
 
+    // Exercise 6.1 - Implement a "fleeing" steering behaviour
     void flee(PVector target)
     {
         PVector desiredVelocity = PVector.sub(location, target);
