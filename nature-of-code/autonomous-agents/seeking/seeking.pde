@@ -7,6 +7,7 @@ void setup() {
 
 void update() {
     a.arrive(new PVector(mouseX, mouseY));
+    a.wander(true);
     a.update();
 }
 
