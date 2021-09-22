@@ -1,4 +1,6 @@
 class Vehicle {
+    final static int arriveDistance = 100;
+
     PVector location;
     PVector velocity;
     PVector acceleration;
@@ -26,11 +28,26 @@ class Vehicle {
     void seek(PVector target)
     {
         PVector desiredVelocity = PVector.sub(target, location);
-        desiredVelocity.normalize();
-        desiredVelocity.mult(maxspeed);
+        desiredVelocity.setMag(maxspeed);
 
         PVector steer = PVector.sub(desiredVelocity, velocity);
 
+        steer.limit(maxforce);
+
+        applyForce(steer);
+    }
+
+    void arrive(PVector target)
+    {
+        PVector desiredVelocity = PVector.sub(target, location);
+
+        float distanceToTarget = desiredVelocity.mag();
+
+        // Adjusting desiredVelocity magnitude depending on target distance
+        float velocityMagnitude = distanceToTarget < arriveDistance ? distanceToTarget * maxspeed / arriveDistance : maxspeed;
+        desiredVelocity.setMag(velocityMagnitude);
+
+        PVector steer = PVector.sub(desiredVelocity, velocity);
         steer.limit(maxforce);
 
         applyForce(steer);
@@ -65,8 +82,8 @@ class Vehicle {
             rotate(theta);
             beginShape();
             vertex(0, -radius * 2);
-            vertex(-radius, radius*2);
-            vertex(radius, radius*2);
+            vertex(-radius, radius * 2);
+            vertex(radius, radius * 2);
             endShape();
         }
         popMatrix();
