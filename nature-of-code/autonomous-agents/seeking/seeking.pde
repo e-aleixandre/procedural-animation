@@ -1,22 +1,34 @@
 Target a;
-Vehicle b;
+Target b;
+Vehicle c;
 FlowField ff;
 
 void setup() {
-    size(1080, 1080);
-    a = new Target(width / 4, height / 4);
-    b = new Vehicle(width / 2, height / 2);
+    size(800, 800);
+    
+    a = new Target(random(0, width), random(0, height));
+    b = new Target(random(0, width), random(0, height));
+    c = new Vehicle(random(0, width), random(0, height));
     ff = new FlowField(FlowType.PERLIN, 300);
 }
 
 void update() {
     PVector mouse = new PVector(mouseX, mouseY);
-    PVector steer = a.seek(mouse);
-    a.applyForce(steer);
+    PVector steerA = a.wander(false);
+    PVector steerB = b.seek(a.location);
+    PVector steerC = c.pursue(a);
+
+    a.applyForce(steerA);
+    b.applyForce(steerB);
+    c.applyForce(steerC);
+
+    a.avoidWalls(50);
+    b.avoidWalls(50);
+    c.avoidWalls(50);
+
     a.update();
-    steer = b.pursue(a);
-    b.applyForce(steer);
     b.update();
+    c.update();
 }
 
 void draw() {
@@ -24,4 +36,5 @@ void draw() {
     update();
     a.display();
     b.display();
+    c.display();
 }

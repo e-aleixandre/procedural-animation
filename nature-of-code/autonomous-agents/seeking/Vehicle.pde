@@ -17,7 +17,7 @@ class Vehicle {
         radius = 5.0f;
 
         maxspeed = 4.0f;
-        maxforce = 0.1f;
+        maxforce = 4.0f;
 
         wanderAngle = .0f;
         fleeDistance = 100;
@@ -65,8 +65,9 @@ class Vehicle {
         desiredVelocity.setMag(maxspeed);
         
         PVector steer = PVector.sub(desiredVelocity, velocity);
-
+        
         steer.limit(maxforce);
+        
         return steer;
     }
 
@@ -100,8 +101,12 @@ class Vehicle {
         return seek(prediction);
     }
 
-    void evade(Vehicle target)
+    PVector evade(Vehicle target)
     {
+        PVector steer = pursue(target);
+        steer.mult(-1);
+
+        return steer;
     }
 
     PVector follow(FlowField ff)
@@ -135,6 +140,7 @@ class Vehicle {
         // Polar coordinates
         // x = r * cos(angle)
         // y = r * sin(angle)
+        // NOTE: Reynolds actually displaces the circlePoint around a smaller circle and maps the point to the bigger circle
         PVector circlePoint = new PVector(circleCenter.x + radius * cos(wanderAngle), circleCenter.y + radius * sin(wanderAngle));
         
         // This is kind of an anti-pattern, drawing in the update function
@@ -151,6 +157,41 @@ class Vehicle {
 
         // Step 4
         return seek(circlePoint);
+    }
+
+    /**
+     * This implementation is bad. Corners aren't working.
+     */
+    void avoidWalls(int threshold)
+    {
+        PVector desired = null;
+
+        if (location.x > width - threshold)
+        {
+            desired = new PVector(-maxspeed, velocity.y);
+        }
+        else if (location.x < threshold)
+        {
+            desired = new PVector(maxspeed, velocity.y);
+        }
+        
+        if (location.y > height - threshold)
+        {
+            desired = new PVector(velocity.x, -maxspeed);
+            desired.setMag(maxspeed);
+        }
+        else if (location.y < threshold)
+        {
+            desired = new PVector(velocity.x, maxspeed);
+            desired.setMag(maxspeed);
+        }
+
+        if (desired != null)
+        {
+            PVector steer = PVector.sub(desired, velocity);
+            steer.limit(maxforce);
+            applyForce(steer);
+        }
     }
 
     void applyForce(PVector force)
