@@ -4,12 +4,11 @@ FlowField ff;
 void setup() {
     size(512, 512);
     a = new Vehicle(width / 2, height / 2);
-    ff = new FlowField(FlowType.PERLIN);
+    ff = new FlowField(FlowType.PERLIN, 50);
 }
 
 void update() {
-    a.arrive(new PVector(mouseX, mouseY));
-    a.wander(true);
+    a.follow(ff);
     a.update();
 }
 

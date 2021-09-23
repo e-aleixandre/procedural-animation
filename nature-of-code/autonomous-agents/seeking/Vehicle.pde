@@ -15,7 +15,7 @@ class Vehicle {
         location = new PVector(x, y);
         radius = 5.0f;
 
-        maxspeed = 4.0f;
+        maxspeed = 2.0f;
         maxforce = 0.1f;
 
         wanderAngle = .0f;
@@ -106,6 +106,17 @@ class Vehicle {
         }
 
 
+    }
+
+    void follow(FlowField ff) {
+        PVector desired = ff.lookup(location);
+        // FlowField.lookup returns a normalized vector
+        desired.mult(maxspeed);
+        
+        PVector steer = PVector.sub(desired, velocity);
+        steer.limit(maxforce);
+
+        applyForce(steer);
     }
 
     void applyForce(PVector force)
