@@ -1,15 +1,17 @@
 Vehicle a;
+Vehicle b;
 FlowField ff;
 
 void setup() {
-    size(512, 512);
+    size(1080, 1080);
     a = new Vehicle(width / 2, height / 2);
+    b = new Vehicle(width / 2, height / 2);
     ff = new FlowField(FlowType.PERLIN);
 }
 
 void update() {
-    a.arrive(new PVector(mouseX, mouseY));
-    a.wander(true);
+    PVector mouse = new PVector(mouseX, mouseY);
+    a.follow(ff);
     a.update();
 }
 
@@ -18,5 +20,4 @@ void draw() {
     update();
     ff.draw();
     a.display();
-    
 }

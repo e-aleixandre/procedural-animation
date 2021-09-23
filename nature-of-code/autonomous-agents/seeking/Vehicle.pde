@@ -8,6 +8,7 @@ class Vehicle {
     float maxforce;
     float radius;
     float wanderAngle;
+    int fleeDistance;
 
     Vehicle(float x, float y) {
         acceleration = new PVector(0, 0);
@@ -19,6 +20,7 @@ class Vehicle {
         maxforce = 0.1f;
 
         wanderAngle = .0f;
+        fleeDistance = 100;
     }
 
     void update() {
@@ -60,11 +62,43 @@ class Vehicle {
     void flee(PVector target)
     {
         PVector desiredVelocity = PVector.sub(location, target);
-        desiredVelocity.normalize().mult(maxspeed);
+        desiredVelocity.setMag(maxspeed);
         
         PVector steer = PVector.sub(desiredVelocity, velocity);
 
         steer.limit(maxforce);
+        applyForce(steer);
+    }
+
+    /**
+    * Just to illustrate the difference between steering behaviours and "straight following"
+     */
+    void towards(PVector target)
+    {
+        PVector desiredVelocity = PVector.sub(target, location);
+        desiredVelocity.setMag(maxspeed);
+
+        velocity = desiredVelocity;
+    }
+
+    void fleeAndWander(PVector target, boolean draw)
+    {
+        PVector fleeVelocity = PVector.sub(location, target);
+
+        if (fleeVelocity.mag() < fleeDistance)
+            flee(target);
+        else
+            wander(draw);
+    }
+
+    void follow(FlowField ff)
+    {
+        PVector desired = ff.lookup(location);
+        desired.mult(maxspeed);  // FlowField.lookup always returns a normalized vector
+
+        PVector steer = PVector.sub(desired, velocity);
+        steer.limit(maxforce);
+
         applyForce(steer);
     }
 
