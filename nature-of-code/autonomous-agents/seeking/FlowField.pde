@@ -9,8 +9,8 @@ class FlowField
     int cols, rows;
     int resolution;
 
-    FlowField(FlowType type) {
-        resolution = 50;
+    FlowField(FlowType type, int resolution) {
+        this.resolution = resolution;
         cols = width / resolution;
         rows = height / resolution;
         field = new PVector[cols][rows];

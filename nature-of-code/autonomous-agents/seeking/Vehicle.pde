@@ -91,6 +91,15 @@ class Vehicle {
             wander(draw);
     }
 
+    void pursue(Vehicle target)
+    {
+        PVector desired = target.location.copy();
+        // How many frames ahead? 20 (1/3 secs) seems a reasonable number
+        desired.add(PVector.mult(target.velocity, 20));
+
+        seek(desired);
+    }
+
     void follow(FlowField ff)
     {
         PVector desired = ff.lookup(location);
@@ -138,8 +147,6 @@ class Vehicle {
             fill(255, 255, 255);
             circle(circlePoint.x, circlePoint.y, 5);
         }
-
-
     }
 
     void applyForce(PVector force)
