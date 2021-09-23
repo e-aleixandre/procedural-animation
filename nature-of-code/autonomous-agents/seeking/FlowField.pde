@@ -24,7 +24,6 @@ class FlowField
             {
                 PVector cellCenter = new PVector(i * resolution + resolution / 2, j * resolution + resolution / 2);
                 drawVector(cellCenter, field[i][j]);
-                System.out.format("(%f, %f)\n", field[i][j].x, field[i][j].y);
             }
         }
     }
@@ -45,7 +44,7 @@ class FlowField
 
     private void centerFlowField() {
         PVector screenCenter = new PVector(width / 2, height / 2);
-
+        
         for (int i = 0; i < cols; i++) {
             for (int j = 0; j < rows; j++) {
                 PVector cellCenter = new PVector(i * resolution + resolution / 2, j * resolution + resolution / 2);
@@ -84,12 +83,10 @@ class FlowField
             fill(255, 255, 255);
             
             translate(center.x, center.y);
-            float angle = PVector.angleBetween(new PVector(1, 0), vector);
-            System.out.format("Angle: %f\n", angle);
-            rotate(angle);
-            line(0, 0, vector.mag() + resolution / 2, 0);
-            line(vector.mag() + resolution / 2, 0, vector.mag() + resolution / 2 - 8, -8);
-            line(vector.mag() + resolution / 2, 0, vector.mag() + resolution / 2 - 8, 8);
+            rotate(atan2(vector.y, vector.x));
+            line(0, 0, vector.mag() + resolution / 4, 0);
+            line(vector.mag() + resolution / 4, 0, vector.mag() + resolution / 4 - 8, -8);
+            line(vector.mag() + resolution / 4, 0, vector.mag() + resolution / 4 - 8, 8);
         }
         popMatrix();
     }
