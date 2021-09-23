@@ -1,6 +1,6 @@
 class Vehicle {
     final static int arriveDistance = 100;
-    final static float maxWanderVariation = PI / 6;
+    final static float maxWanderVariation = PI / 8;
     PVector location;
     PVector velocity;
     PVector acceleration;
