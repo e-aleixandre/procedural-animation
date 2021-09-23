@@ -11,9 +11,11 @@ void setup() {
 
 void update() {
     PVector mouse = new PVector(mouseX, mouseY);
-    a.seek(mouse);
+    PVector steer = a.seek(mouse);
+    a.applyForce(steer);
     a.update();
-    b.pursue(a);
+    steer = b.pursue(a);
+    b.applyForce(steer);
     b.update();
 }
 

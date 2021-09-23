@@ -30,7 +30,7 @@ class Vehicle {
         acceleration.set(0, 0);
     }
 
-    void seek(PVector target)
+    PVector seek(PVector target)
     {
         PVector desiredVelocity = PVector.sub(target, location);
         desiredVelocity.setMag(maxspeed);
@@ -39,10 +39,10 @@ class Vehicle {
 
         steer.limit(maxforce);
 
-        applyForce(steer);
+        return steer;
     }
 
-    void arrive(PVector target)
+    PVector arrive(PVector target)
     {
         PVector desiredVelocity = PVector.sub(target, location);
 
@@ -55,11 +55,11 @@ class Vehicle {
         PVector steer = PVector.sub(desiredVelocity, velocity);
         steer.limit(maxforce);
 
-        applyForce(steer);
+        return steer;
     }
 
     // Exercise 6.1 - Implement a "fleeing" steering behaviour
-    void flee(PVector target)
+    PVector flee(PVector target)
     {
         PVector desiredVelocity = PVector.sub(location, target);
         desiredVelocity.setMag(maxspeed);
@@ -67,7 +67,7 @@ class Vehicle {
         PVector steer = PVector.sub(desiredVelocity, velocity);
 
         steer.limit(maxforce);
-        applyForce(steer);
+        return steer;
     }
 
     /**
@@ -81,26 +81,30 @@ class Vehicle {
         velocity = desiredVelocity;
     }
 
-    void fleeAndWander(PVector target, boolean draw)
+    PVector fleeAndWander(PVector target, boolean draw)
     {
         PVector fleeVelocity = PVector.sub(location, target);
 
         if (fleeVelocity.mag() < fleeDistance)
-            flee(target);
+            return flee(target);
         else
-            wander(draw);
+            return wander(draw);
     }
 
-    void pursue(Vehicle target)
+    PVector pursue(Vehicle target)
     {
-        PVector desired = target.location.copy();
+        PVector prediction = target.location.copy();
         // How many frames ahead? 20 (1/3 secs) seems a reasonable number
-        desired.add(PVector.mult(target.velocity, 20));
+        prediction.add(PVector.mult(target.velocity, 20));
 
-        seek(desired);
+        return seek(prediction);
     }
 
-    void follow(FlowField ff)
+    void evade(Vehicle target)
+    {
+    }
+
+    PVector follow(FlowField ff)
     {
         PVector desired = ff.lookup(location);
         desired.mult(maxspeed);  // FlowField.lookup always returns a normalized vector
@@ -108,10 +112,10 @@ class Vehicle {
         PVector steer = PVector.sub(desired, velocity);
         steer.limit(maxforce);
 
-        applyForce(steer);
+        return steer;
     }
 
-    void wander(boolean draw)
+    PVector wander(boolean draw)
     {
         // 1. Determine a circle that will contain the target
         // 2. Get a random angle variation and add it to the current angle
@@ -133,9 +137,6 @@ class Vehicle {
         // y = r * sin(angle)
         PVector circlePoint = new PVector(circleCenter.x + radius * cos(wanderAngle), circleCenter.y + radius * sin(wanderAngle));
         
-        // Step 4
-        seek(circlePoint);
-        
         // This is kind of an anti-pattern, drawing in the update function
         if (draw)
         {
@@ -147,6 +148,9 @@ class Vehicle {
             fill(255, 255, 255);
             circle(circlePoint.x, circlePoint.y, 5);
         }
+
+        // Step 4
+        return seek(circlePoint);
     }
 
     void applyForce(PVector force)
