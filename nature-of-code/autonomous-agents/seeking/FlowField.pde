@@ -9,8 +9,8 @@ class FlowField
     int cols, rows;
     int resolution;
 
-    FlowField(FlowType type, int r) {
-        resolution = r;
+    FlowField(FlowType type, int resolution) {
+        this.resolution = resolution;
         cols = width / resolution;
         rows = height / resolution;
         field = new PVector[cols][rows];
@@ -31,7 +31,6 @@ class FlowField
     PVector lookup(PVector position) {
         int column = constrain(int(position.x / resolution), 0, cols - 1);
         int row = constrain(int(position.y / resolution), 0, rows - 1);
-        
         return field[column][row].copy();
     }
 
@@ -77,9 +76,9 @@ class FlowField
             for (int j = 0; j < rows; j++) {
                 float theta = map(noise(xoff, yoff), 0, 1, 0, TWO_PI);
                 field[i][j] = new PVector(cos(theta), sin(theta));
-                yoff += 0.2;
+                yoff += 0.25;
             }
-            xoff += 0.2;
+            xoff += 0.25;
         }
     }
 
@@ -91,9 +90,9 @@ class FlowField
             
             translate(center.x, center.y);
             rotate(atan2(vector.y, vector.x));
-            line(0, 0, vector.mag() + resolution / 4, 0);
-            line(vector.mag() + resolution / 4, 0, vector.mag() + resolution / 4 - resolution / 8, - resolution / 8);
-            line(vector.mag() + resolution / 4, 0, vector.mag() + resolution / 4 - resolution / 8, resolution / 8);
+            line(0, 0, resolution / 4, 0);
+            line(resolution / 4, 0, resolution / 4 - resolution / 8, - resolution / 8);
+            line(resolution / 4, 0, resolution / 4 - resolution / 8, resolution / 8);
         }
         popMatrix();
     }

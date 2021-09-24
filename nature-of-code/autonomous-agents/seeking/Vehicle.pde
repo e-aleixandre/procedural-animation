@@ -8,6 +8,7 @@ class Vehicle {
     float maxforce;
     float radius;
     float wanderAngle;
+    int fleeDistance;
 
     Vehicle(float x, float y) {
         acceleration = new PVector(0, 0);
@@ -15,10 +16,11 @@ class Vehicle {
         location = new PVector(x, y);
         radius = 5.0f;
 
-        maxspeed = 2.0f;
-        maxforce = 0.1f;
+        maxspeed = 4.0f;
+        maxforce = 4.0f;
 
         wanderAngle = .0f;
+        fleeDistance = 100;
     }
 
     void update() {
@@ -28,7 +30,7 @@ class Vehicle {
         acceleration.set(0, 0);
     }
 
-    void seek(PVector target)
+    PVector seek(PVector target)
     {
         PVector desiredVelocity = PVector.sub(target, location);
         desiredVelocity.setMag(maxspeed);
@@ -37,10 +39,10 @@ class Vehicle {
 
         steer.limit(maxforce);
 
-        applyForce(steer);
+        return steer;
     }
 
-    void arrive(PVector target)
+    PVector arrive(PVector target)
     {
         PVector desiredVelocity = PVector.sub(target, location);
 
@@ -53,22 +55,72 @@ class Vehicle {
         PVector steer = PVector.sub(desiredVelocity, velocity);
         steer.limit(maxforce);
 
-        applyForce(steer);
+        return steer;
     }
 
     // Exercise 6.1 - Implement a "fleeing" steering behaviour
-    void flee(PVector target)
+    PVector flee(PVector target)
     {
         PVector desiredVelocity = PVector.sub(location, target);
-        desiredVelocity.normalize().mult(maxspeed);
+        desiredVelocity.setMag(maxspeed);
         
         PVector steer = PVector.sub(desiredVelocity, velocity);
-
+        
         steer.limit(maxforce);
-        applyForce(steer);
+        
+        return steer;
     }
 
-    void wander(boolean draw)
+    /**
+    * Just to illustrate the difference between steering behaviours and "straight following"
+     */
+    void towards(PVector target)
+    {
+        PVector desiredVelocity = PVector.sub(target, location);
+        desiredVelocity.setMag(maxspeed);
+
+        velocity = desiredVelocity;
+    }
+
+    PVector fleeAndWander(PVector target, boolean draw)
+    {
+        PVector fleeVelocity = PVector.sub(location, target);
+
+        if (fleeVelocity.mag() < fleeDistance)
+            return flee(target);
+        else
+            return wander(draw);
+    }
+
+    PVector pursue(Vehicle target)
+    {
+        PVector prediction = target.location.copy();
+        // How many frames ahead? 20 (1/3 secs) seems a reasonable number
+        prediction.add(PVector.mult(target.velocity, 20));
+
+        return seek(prediction);
+    }
+
+    PVector evade(Vehicle target)
+    {
+        PVector steer = pursue(target);
+        steer.mult(-1);
+
+        return steer;
+    }
+
+    PVector follow(FlowField ff)
+    {
+        PVector desired = ff.lookup(location);
+        desired.mult(maxspeed);  // FlowField.lookup always returns a normalized vector
+
+        PVector steer = PVector.sub(desired, velocity);
+        steer.limit(maxforce);
+
+        return steer;
+    }
+
+    PVector wander(boolean draw)
     {
         // 1. Determine a circle that will contain the target
         // 2. Get a random angle variation and add it to the current angle
@@ -88,10 +140,8 @@ class Vehicle {
         // Polar coordinates
         // x = r * cos(angle)
         // y = r * sin(angle)
+        // NOTE: Reynolds actually displaces the circlePoint around a smaller circle and maps the point to the bigger circle
         PVector circlePoint = new PVector(circleCenter.x + radius * cos(wanderAngle), circleCenter.y + radius * sin(wanderAngle));
-        
-        // Step 4
-        seek(circlePoint);
         
         // This is kind of an anti-pattern, drawing in the update function
         if (draw)
@@ -105,7 +155,43 @@ class Vehicle {
             circle(circlePoint.x, circlePoint.y, 5);
         }
 
+        // Step 4
+        return seek(circlePoint);
+    }
 
+    /**
+     * This implementation is bad. Corners aren't working.
+     */
+    void avoidWalls(int threshold)
+    {
+        PVector desired = null;
+
+        if (location.x > width - threshold)
+        {
+            desired = new PVector(-maxspeed, velocity.y);
+        }
+        else if (location.x < threshold)
+        {
+            desired = new PVector(maxspeed, velocity.y);
+        }
+        
+        if (location.y > height - threshold)
+        {
+            desired = new PVector(velocity.x, -maxspeed);
+            desired.setMag(maxspeed);
+        }
+        else if (location.y < threshold)
+        {
+            desired = new PVector(velocity.x, maxspeed);
+            desired.setMag(maxspeed);
+        }
+
+        if (desired != null)
+        {
+            PVector steer = PVector.sub(desired, velocity);
+            steer.limit(maxforce);
+            applyForce(steer);
+        }
     }
 
     void follow(FlowField ff) {
