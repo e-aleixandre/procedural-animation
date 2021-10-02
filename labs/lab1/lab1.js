@@ -1,33 +1,40 @@
 let font;
+let boids = [];
+
 function preload() {
   font = loadFont('assets/Inconsolata.otf');
 }
 
 let points;
-let bounds;
-function setup() {
-  createCanvas(100, 100);
-  stroke(0);
-  fill(255, 104, 204);
+let vehicle;
+let target;
 
-  points = font.textToPoints('p5', 0, 0, 10, {
-    sampleFactor: 5,
-    simplifyThreshold: 0
-  });
-  bounds = font.textBounds(' p5 ', 0, 0, 10);
+function setup() {
+  createCanvas(1280, 720);
+  points = font.textToPoints('Lab 1 - TPA', 100, 200, 200);
+  stroke('purple');
+  strokeWeight(4);
+  
+  vehicle = new Vehicle(100, 100);
+  target = new Target(150, 150);
 }
 
 function draw() {
   background(255);
-  beginShape();
-  translate(-bounds.x * width / bounds.w, -bounds.y * height / bounds.h);
-  for (let i = 0; i < points.length; i++) {
-    let p = points[i];
-    vertex(
-      p.x * width / bounds.w +
-        sin(20 * p.y / bounds.h + millis() / 1000) * width / 30,
-      p.y * height / bounds.h
-    );
+  
+  const steer = vehicle.arrive(createVector(mouseX, mouseY));
+  vehicle.applyForce(steer);
+  vehicle.update();
+  
+  vehicle.display();
+  
+  const targetSteer = target.fleeAndWander(vehicle.location, true);
+  target.applyForce(targetSteer);
+  target.update();
+  target.display();
+  
+  for (let i = 0; i < points.length; ++i)
+  {
+    point(points[i].x, points[i].y);
   }
-  endShape(CLOSE);
 }
