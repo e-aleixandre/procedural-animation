@@ -3,6 +3,8 @@ let boids = [];
 let players = [];
 let fruitManager;
 
+let separate;
+
 const numPlayers = 3;
 
 function preload() {
@@ -25,6 +27,8 @@ function setup() {
   }
 
   setupUI();
+
+  separate = false;
 }
 
 function draw() {
@@ -63,8 +67,15 @@ function draw() {
   for (let i = 0; i < boids.length; ++i)
   {
     const boid = boids[i];
-    const closestPlayer = getClosestPlayer(boid, players);
-    const steer = boid.fleeOrArrive(closestPlayer.location, 100);
+    
+
+    if (separate) {
+      steer = boid.separate(boids, 50);
+    } else {
+      const closestPlayer = getClosestPlayer(boid, players);
+      steer = boid.fleeOrArrive(closestPlayer.location, 100);
+    }
+
     boid.applyForce(steer);
     boid.update();
     boid.display();
@@ -94,10 +105,11 @@ function getClosestPlayer(boid, players) {
 function setupUI() {
   const addPlayerButton = createButton("Add player");
   addPlayerButton.mousePressed(addPlayer);
-}
 
-function minTimeBetweenFruitsChanged() {
-  event.target.value
+  const separateButton = createButton("Separate boids");
+  separateButton.mousePressed(function() {
+    separate = !separate;
+  });
 }
 
 function addPlayer() {
