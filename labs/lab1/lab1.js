@@ -53,7 +53,7 @@ function draw() {
     strokeWeight(1);
     fill(player.color);
     textSize(24);
-    text("Player " + i + " points: " + player.points, 20, height - 20 - 20 * i);
+    text("Player " + i + " points: " + player.points, 20, height - 20 * (i + 1));
     player.applyForce(playerSteer);
     player.update();
     player.display();
