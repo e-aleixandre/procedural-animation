@@ -5,36 +5,35 @@ function preload() {
   font = loadFont('assets/Inconsolata.otf');
 }
 
-let points;
 let vehicle;
 let target;
 
 function setup() {
   createCanvas(1280, 720);
-  points = font.textToPoints('Lab 1 - TPA', 100, 200, 200);
-  stroke('purple');
-  strokeWeight(4);
   
-  vehicle = new Vehicle(100, 100);
-  target = new Target(150, 150);
+  // Get letter points and create boids
+  let points = font.textToPoints('Lab 1 - TPA', 100, 200, 200);
+  
+  for (let i = 0; i < points.length; ++i)
+  {
+    const objective = createVector(points[i].x, points[i].y);
+    const location = createVector(random(0, width), random(0, height));
+    const boid = new Boid(location.x, location.y, objective);
+    boids.push(boid);
+  }
 }
 
 function draw() {
   background(255);
   
-  const steer = vehicle.arrive(createVector(mouseX, mouseY));
-  vehicle.applyForce(steer);
-  vehicle.update();
+  const mousePosition = createVector(mouseX, mouseY);
   
-  vehicle.display();
-  
-  const targetSteer = target.fleeAndWander(vehicle.location, true);
-  target.applyForce(targetSteer);
-  target.update();
-  target.display();
-  
-  for (let i = 0; i < points.length; ++i)
+  for (let i = 0; i < boids.length; ++i)
   {
-    point(points[i].x, points[i].y);
+    const boid = boids[i];
+    const steer = boid.fleeOrArrive(mousePosition, 100);
+    boid.applyForce(steer);
+    boid.update();
+    boid.display();
   }
 }

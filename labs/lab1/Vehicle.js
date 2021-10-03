@@ -1,6 +1,6 @@
 // Global variables, consider these static class members
 const arriveDistance = 100;
-const maxWanderVariation = window.PI / 8;
+const maxWanderVariation = 0.39269908169872414;  // PI / 8, p5 isnt loaded when the class is imported so I predefined it
 
 class Vehicle {
   
@@ -52,8 +52,10 @@ class Vehicle {
     let fleeVelocity = p5.Vector.sub(this.location, target);
     
     if (fleeVelocity.mag() < this.fleeDistance) {
+      console.log("Should flee, distance: ", fleeVelocity.mag());
       return this.flee(target);
     } else {
+      console.log("Should wander, distance: ", fleeVelocity.mag());
       return this.wander(draw);
     }
   }
