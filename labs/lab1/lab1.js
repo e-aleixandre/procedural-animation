@@ -3,7 +3,12 @@ let boids = [];
 let players = [];
 let fruitManager;
 
-let separate;
+const options = {
+  objective: true,
+  separate: false,
+  cohesion: false,
+  align: false
+}
 
 const numPlayers = 3;
 
@@ -68,18 +73,41 @@ function draw() {
   {
     const boid = boids[i];
     
+    const steer = createVector();
 
-    if (separate) {
-      steer = boid.separate(boids, 50);
-    } else {
+    if (options.objective) {
+      steer.add(boid.arrive());
+    }
+
+    if (options.separate) {
+      steer.add(boid.separate(boids, 50));
+    }
+
+    if (options.cohesion) {
+      steer.add(boid.cohesion(boids, 50));
+    }
+
+    if (options.align)  {
+      steer.add(boid.align(boids, 50));
+    }
+
+    if (options.flee) {
       const closestPlayer = getClosestPlayer(boid, players);
-      steer = boid.fleeOrArrive(closestPlayer.location, 100);
+      steer.add(boid.fleeIfClose(closestPlayer.location, 100));
     }
 
     boid.applyForce(steer);
     boid.update();
     boid.display();
   }
+
+  fill(0);
+  noStroke();
+  text("(O)bjective: " + (options.objective ? "Enabled" : "Disabled"), width - 320, height - 100);
+  text("(S)eparate: " + (options.separate ? "Enabled" : "Disabled"), width - 320, height - 80);
+  text("(C)ohesion: " + (options.cohesion ? "Enabled" : "Disabled"), width - 320, height - 60);
+  text("(A)lign: " + (options.align ? "Enabled" : "Disabled"), width - 320, height - 40);
+  text("(F)lee: " + (options.flee ? "Enabled" : "Disabled"), width - 320, height - 20);
 }
 
 function getClosestPlayer(boid, players) {
@@ -105,11 +133,6 @@ function getClosestPlayer(boid, players) {
 function setupUI() {
   const addPlayerButton = createButton("Add player");
   addPlayerButton.mousePressed(addPlayer);
-
-  const separateButton = createButton("Separate boids");
-  separateButton.mousePressed(function() {
-    separate = !separate;
-  });
 }
 
 function addPlayer() {
@@ -181,4 +204,25 @@ function createPulse() {
 
 function mousePressed() {
   createPulse();
+}
+
+function keyTyped() {
+  switch(key) {
+    case 'o':
+    case 'O':
+      options.objective = !options.objective;
+      break;
+    case 's':
+    case 'S':
+      options.separate = !options.separate;
+      break;
+    case 'c':
+    case 'C':
+      options.cohesion = !options.cohesion;
+      break;
+    case 'a':
+    case 'A':
+      options.align = !options.align;
+      break;
+  }
 }
