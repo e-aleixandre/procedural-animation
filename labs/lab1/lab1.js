@@ -1,5 +1,6 @@
 let font;
 let boids = [];
+let fruitManager;
 
 function preload() {
   font = loadFont('assets/Inconsolata.otf');
@@ -21,10 +22,15 @@ function setup() {
     const boid = new Boid(location.x, location.y, objective);
     boids.push(boid);
   }
+  
+  fruitManager = new FruitManager();
 }
 
 function draw() {
   background(255);
+  
+  fruitManager.update();
+  fruitManager.display();
   
   const mousePosition = createVector(mouseX, mouseY);
   
