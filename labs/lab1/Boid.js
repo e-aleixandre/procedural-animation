@@ -29,6 +29,17 @@ class Boid extends Vehicle {
       return this.arrive();
     }
   }
+
+  fleeIfClose(target, minDistance) {
+    const distance = p5.Vector.sub(target, this.location);
+
+    if (distance.mag() < minDistance)
+    {
+      return super.flee(target);
+    } else {
+      return createVector();
+    }
+  }
   
   display() {    
     fill(0);
