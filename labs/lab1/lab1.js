@@ -1,13 +1,13 @@
 let font;
 let boids = [];
+let players = [];
 let fruitManager;
+
+const numPlayers = 3;
 
 function preload() {
   font = loadFont('assets/Inconsolata.otf');
 }
-
-let vehicle;
-let target;
 
 function setup() {
   createCanvas(1280, 720);
@@ -24,6 +24,12 @@ function setup() {
   }
   
   fruitManager = new FruitManager();
+  
+  for (let i = 0; i < numPlayers; ++i)
+  {
+    const playerPosition = createVector(random(0, width), random(0, height));
+    const playerColor = color(random(0, 255), random(0, 255), random(0,255));
+    const player = new Player(playerPosition.x, playerPosition.y, playerColor);
 }
 
 function draw() {
@@ -34,10 +40,33 @@ function draw() {
   
   const mousePosition = createVector(mouseX, mouseY);
   
+  
+  // Player behaviour (if fruit seek, else wander)
+  for (let i = 0; i < players.length; ++i)
+  {
+    let playerSteer;
+    
+    if (fruitManager.hasFruit)
+    {
+      playerSteer = player.seek(fruitManger.fruitLocation);
+      if (fruitManager.consume(player.location))
+      {
+        player.addPoint();
+      }
+    } else {
+      playerSteer = player.wander();
+    }
+    
+    player.applyForce(playerSteer);
+    player.update();
+    player.display();
+  }
+  
+  // Boids behaviour
   for (let i = 0; i < boids.length; ++i)
   {
     const boid = boids[i];
-    const steer = boid.fleeOrArrive(mousePosition, 100);
+    const steer = boid.fleeOrArrive(vehicle.location, 100);
     boid.applyForce(steer);
     boid.update();
     boid.display();
