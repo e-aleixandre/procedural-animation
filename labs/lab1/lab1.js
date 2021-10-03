@@ -30,6 +30,7 @@ function setup() {
     const playerPosition = createVector(random(0, width), random(0, height));
     const playerColor = color(random(0, 255), random(0, 255), random(0,255));
     const player = new Player(playerPosition.x, playerPosition.y, playerColor);
+  }
 }
 
 function draw() {
