@@ -4,6 +4,8 @@ class Boid extends Vehicle {
     // This is the position of the letter this boid occupies
     super(x, y);
     this.objective = objective;
+    this.color = color(random(0, 255), random(0, 255), random(0, 255));
+    this.size = random(1, 10);
   }
   
   /**
@@ -49,7 +51,7 @@ class Boid extends Vehicle {
       const vec = p5.Vector.sub(this.location, boids[i].location);
       const distance = vec.mag();
 
-      if (distance > 0 && distance < desiredSeparation) {
+      if (distance > 0 && distance < boids[i].radius + this.radius) {
         vec.normalize()
         vec.div(distance);
         sum.add(vec);
@@ -121,12 +123,12 @@ class Boid extends Vehicle {
       return sum;  // Which is (0, 0);
     }
   }
-  
+
   display() {    
-    fill(0);
+    fill(this.color);
     stroke(0);
     strokeWeight(2);
     
-    point(this.location.x, this.location.y);
+    circle(this.location.x, this.location.y, this.size);
   }
 }
