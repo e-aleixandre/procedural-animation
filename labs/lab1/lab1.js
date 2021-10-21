@@ -8,9 +8,15 @@ let fruitManager;
 
 const options = {
   objective: true,
+  objectiveMultiplier: 1.0,
   separate: false,
+  separateMultiplier: 1.0,
   cohesion: false,
-  align: false
+  cohesionMultiplier: 1.0,
+  align: false,
+  alignMultiplier: 1.0,
+  flee: false,
+  fleeMultiplier: 1.0
 }
 
 const numPlayers = 3;
@@ -27,7 +33,8 @@ function setup() {
   let points = font.textToPoints('Lab 1 - TPA', 100, 200, 200);
   
   //spawnBoidsFromCircle(points, 250);
-  spawnBoidsFromBottom(points);
+  //spawnBoidsFromBottom(points);
+  spawnBoidsRandomly(points);
 
   fruitManager = new FruitManager();
   
@@ -94,29 +101,29 @@ function draw() {
   {
     const boid = boids[i];
 
-    const neighbours = getCurrentNeighbours(boid.location);
+    const neighbours = getCurrentNeighbours(boid);
     
     const steer = createVector();
 
     if (options.objective) {
-      steer.add(boid.arrive().mult(1.5));
+      steer.add(boid.arrive().mult(options.objectiveMultiplier));
     }
 
     if (options.separate) {
-      steer.add(boid.separate(/* boids */neighbours, 50).mult(1.4));
+      steer.add(boid.separate(/* boids */neighbours, 50).mult(options.separateMultiplier));
     }
 
     if (options.cohesion) {
-      steer.add(boid.cohesion(/* boids */neighbours, 50).mult(0.6));
+      steer.add(boid.cohesion(/* boids */neighbours, 50).mult(options.cohesionMultiplier));
     }
 
     if (options.align)  {
-      steer.add(boid.align(/* boids */neighbours, 50));
+      steer.add(boid.align(/* boids */neighbours, 50).mult(options.alignMultiplier));
     }
 
     if (options.flee) {
       const closestPlayer = getClosestPlayer(boid, players);
-      steer.add(boid.fleeIfClose(closestPlayer.location, 100).mult(2));
+      steer.add(boid.fleeIfClose(closestPlayer.location, 100).mult(options.fleeMultiplier));
     }
 
     boid.applyForce(steer);
@@ -156,6 +163,27 @@ function getClosestPlayer(boid, players) {
 function setupUI() {
   const addPlayerButton = createButton("Add player");
   addPlayerButton.mousePressed(addPlayer);
+
+  const removePlayerButton = createButton("Remove player");
+  removePlayerButton.mousePressed(removePlayer);
+
+  // Hacky way to add the event listeners to each input
+  const variables = ["objective", "separate", "cohesion", "align", "flee"];
+
+  variables.forEach(function(variable) {
+
+    const slider = document.getElementById(variable);
+
+    document.getElementById(variable + "Value").innerText = options[variable + "Multiplier"];
+    slider.value = options[variable + "Multiplier"];
+
+    slider.addEventListener("input", function(event) {
+      options[event.target.id + "Multiplier"] = parseFloat(event.target.value);
+
+      const valueElement = event.target.parentElement.parentElement.querySelector("#" + event.target.id + "Value");
+      valueElement.innerText = event.target.value;
+    });
+  });
 }
 
 function addPlayer() {
@@ -163,6 +191,10 @@ function addPlayer() {
   const playerColor = color(random(0, 255), random(0, 255), random(0,255));
   const player = new Player(playerPosition.x, playerPosition.y, playerColor);
   players.push(player);
+}
+
+function removePlayer() {
+  players.pop();
 }
 
 function spawnBoidsFromCircle(points, radius) {
@@ -235,10 +267,6 @@ function createPulse() {
   }
 }
 
-function mousePressed() {
-  createPulse();
-}
-
 function keyTyped() {
   switch(key) {
     case 'o':
@@ -273,14 +301,22 @@ function refreshGrid(boids) {
   // Then put each boid on its cell
   for (let i = 0; i < boids.length; ++i)
   {
-    let currentCol = int(boids[i].location.x / cellSize);
-    let currentRow = int(boids[i].location.y / cellSize);
+    let [currentCol, currentRow] = getCurrentGridPosition(boids[i]);
 
     grid[currentCol][currentRow].push(boids[i]);
   }
 }
-function getCurrentNeighbours(location) {
-  let currentCol = int(location.x / cellSize);
-  let currentRow = int(location.y / cellSize);
+
+function getCurrentNeighbours(boid) {
+  let [currentCol, currentRow] = getCurrentGridPosition(boid);
   return grid[currentCol][currentRow];
+}
+
+function getCurrentGridPosition(boid) {
+  // Constraining to avoid negative or out of bounds indexes
+
+  return [
+    constrain(int(boid.location.x / cellSize), 0, cols - 1),
+    constrain(int(boid.location.y / cellSize), 0, rows - 1)
+  ]
 }
