@@ -5,6 +5,8 @@ let movingGoal = false;
 function setup() {
   createCanvas(400, 400);
   grid = new Grid(20, 20, 20);
+
+  window.addEventListener("contextmenu", e => e.preventDefault());
 }
 
 function draw() {

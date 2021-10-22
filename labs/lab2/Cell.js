@@ -1,11 +1,9 @@
 class Cell {
-    constructor() {
+
+    constructor(posX, posY) {
+        this.x = posX;
+        this.y = posY;
         this.obstacle = false;
-        this.path = false;
         this.searched = false;
-    }
-
-    draw(col, row) {
-
     }
 }
