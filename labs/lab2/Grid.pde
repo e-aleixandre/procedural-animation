@@ -67,10 +67,14 @@ class Grid {
         return cell != null && this.start == cell;
     }
 
+    public boolean isStart(Cell cell) {
+        return cell == this.start;
+    }
+
     public void moveStart(int mouseX, int mouseY) {
         Cell cell = getCellFromPosition(mouseX, mouseY);
 
-        if (cell == null || cell.isObstacle())
+        if (cell == null || cell.isObstacle() || this.isGoal(cell))
             return;
 
         cell.obstacle = false;
@@ -83,10 +87,14 @@ class Grid {
         return cell != null && this.goal == cell;
     }
 
+    public boolean isGoal(Cell cell) {
+        return cell == this.goal;
+    }
+
     public void moveGoal(int mouseX, int mouseY) {
         Cell cell = getCellFromPosition(mouseX, mouseY);
 
-        if (cell == null || cell.isObstacle())
+        if (cell == null || cell.isObstacle() || this.isStart(cell))
             return;
 
         cell.obstacle = false;
