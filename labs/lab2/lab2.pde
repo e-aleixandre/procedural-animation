@@ -1,9 +1,13 @@
 final int cols = 20, rows = 20, cellsize = 20;
 Grid grid;
+Dijkstra dijkstra;
+Astar astar;
+Heuristic heuristic;
 
 // Fixing problems with processing handling dragging
 boolean holdingLeft = false, holdingRight = false,
-        movingStart = false, movingGoal = false;
+        movingStart = false, movingGoal = false,
+        iterate = false;
 
 void settings() {
     size(cols * cellsize, rows * cellsize);
@@ -11,13 +15,23 @@ void settings() {
 
 void setup() {
     grid = new Grid(cols, rows, cellsize);
+    heuristic = new Euclidean();
+    astar = new Astar();
+    astar.setHeuristic(heuristic);
+    grid.setAlgorithm(astar);
+    grid.allowDiagonal(true);
 }
 
 void draw() {
     update();
 
     background(220);
+    
+    if (iterate)
+        grid.iterate();
+    
     grid.draw();
+    grid.drawPath();
 }
 
 void update() {
@@ -57,7 +71,11 @@ void mousePressed() {
 
 void mouseReleased() {
     if (mouseButton == LEFT)
+    {
+        movingGoal = false;
         holdingLeft = false;
+        movingStart = false;
+    }
     else if (mouseButton == RIGHT)
         holdingRight = false;
 }
@@ -71,4 +89,11 @@ void mouseDragged() {
         grid.moveGoal(mouseX, mouseY);
     else if(movingStart)
         grid.moveStart(mouseX, mouseY);
+}
+
+void keyPressed() {
+    if (key == 'i')
+    {
+        iterate = !iterate;
+    }
 }

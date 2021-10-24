@@ -2,9 +2,11 @@ class Grid {
     Cell cells[][];
     Cell start;
     Cell goal;
+    Algorithm algorithm;
     private int cols;
     private int rows;
     private int cellsize;
+    boolean diagonalMovement = false;
 
     Grid(int cols, int rows, int cellsize) {
         this.cols = cols;
@@ -15,41 +17,35 @@ class Grid {
 
         for (int i = 0; i < cols; ++i)
             for (int j = 0; j < rows; ++j)
-                cells[i][j] = new Cell(i * cellsize, j * cellsize);
+                cells[i][j] = new Cell(i, j);
         
         start = cells[0][0];
         goal = cells[cols - 1][rows - 1];
     }
 
     void draw() {
-        strokeWeight(1);
+        color computed = color(172, 172, 242);
 
-        for (Cell[] row : this.cells)
+        for (Cell[] col : this.cells)
         {
-            for (Cell cell : row)
+            for (Cell cell : col)
             {
-                // Is it an obstacle? Paint it black
-                //cell.isObstacle() ? fill(0) : noFill();
-                if (cell.isObstacle())
-                    fill(0);
+                if (algorithm.isComputed(cell))
+                    cell.draw(this.cellsize, computed);
                 else
-                    noFill();
-
-                square(cell.x, cell.y, cellsize);
+                    cell.draw(this.cellsize);
             }
         }
 
-        // Simpler solution: draw start and goal after the loop
-        fill(51, 51, 180);
-        square(start.x, start.y, cellsize);
-        fill(51, 180, 51);
-        square(goal.x, goal.y, cellsize);
+        // Simplest solution: draw start and goal after the loop
+        start.draw(this.cellsize, color(51, 51, 180));
+        goal.draw(this.cellsize, color(51, 180, 51));
     }
 
     public void handleLeftClick(int mouseX, int mouseY) {
         Cell cell = getCellFromPosition(mouseX, mouseY);
 
-        // Prevent obstructing goal/start
+        // Prevent obstructing goal/start, which might not be necessary
         if (cell != null && cell != this.start && cell != this.goal)
             cell.obstacle = true;
     }
@@ -113,5 +109,91 @@ class Grid {
 
     boolean isValid(int column, int row) {
         return column >= 0 && row >= 0 && column < this.cols && row < this.rows;
+    }
+
+    void setAlgorithm(Algorithm algo)
+    {
+        this.algorithm = algo;
+        this.algorithm.setup(this);
+    }
+
+    void iterate()
+    {
+        if (this.algorithm == null)
+            return;
+
+        if (!this.algorithm.isSolved())
+            this.algorithm.iterate();
+    }
+
+    Cell getStart() {
+        return this.start;
+    }
+
+    Cell getGoal() {
+        return this.goal;
+    }
+
+    int getSize() {
+        return this.cols * this.rows;
+    }
+
+    ArrayList<Cell> getNeighbours(int col, int row) {
+        ArrayList<Cell> neighbours = new ArrayList<Cell>();
+
+        if (row > 0 && !cells[col][row - 1].isObstacle()) {
+            neighbours.add(cells[col][row - 1]);
+        }
+
+        if (row < this.rows - 1 && !cells[col][row + 1].isObstacle()) {
+            neighbours.add(cells[col][row + 1]);
+        }
+
+        if (col > 0 && !cells[col - 1][row].isObstacle()) {
+            neighbours.add(cells[col - 1][row]);
+        }
+
+        if (col < this.cols - 1 && !cells[col + 1][row].isObstacle()) {
+            neighbours.add(cells[col + 1][row]);
+        }
+
+        if (diagonalMovement)
+        {
+            if (col - 1 > 0 && row - 1 > 0 && !cells[col - 1][row - 1].isObstacle())
+                neighbours.add(cells[col - 1][row - 1]);
+
+            if (col + 1 < this.cols && row - 1 > 0 && !cells[col + 1][row - 1].isObstacle())
+                neighbours.add(cells[col + 1][row - 1]);
+
+            if (col - 1 > 0 && row + 1 < this.rows && !cells[col - 1][row + 1].isObstacle())
+                neighbours.add(cells[col - 1][row + 1]);
+
+            if (col + 1 < this.cols && row + 1 < this.rows && !cells[col + 1][row + 1].isObstacle())
+                neighbours.add(cells[col + 1][row + 1]);       
+        }
+
+        return neighbours;
+    }
+
+    ArrayList<Cell> getNeighbours(Cell cell) {
+        return getNeighbours(cell.col, cell.row);
+    }
+
+    void drawPath() {
+        ArrayList<Cell> path = this.algorithm.getPath();
+
+        fill(0, 0, 255);
+        strokeWeight(4);
+
+        for (int i = 0; i < path.size() - 2; ++i)
+        {
+            // Ugly code
+            line(path.get(i).col * cellsize + cellsize/2, path.get(i).row * cellsize + cellsize/2, path.get(i + 1).col * cellsize + cellsize/2, path.get(i + 1).row * cellsize + cellsize/2);
+        }
+    }
+
+    void allowDiagonal(boolean allow)
+    {
+        this.diagonalMovement = allow;
     }
 }
