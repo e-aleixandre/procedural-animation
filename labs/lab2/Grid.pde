@@ -1,3 +1,6 @@
+final float MAX_WEIGHT = 5.0;
+final float MIN_WEIGHT = 1.0;
+
 class Grid {
     Cell cells[][];
     Cell start;
@@ -17,7 +20,10 @@ class Grid {
 
         for (int i = 0; i < cols; ++i)
             for (int j = 0; j < rows; ++j)
-                cells[i][j] = new Cell(i, j);
+            {
+                float weight = random(MIN_WEIGHT, MAX_WEIGHT);
+                cells[i][j] = new Cell(i, j, weight);
+            }
         
         start = cells[0][0];
         goal = cells[cols - 1][rows - 1];
@@ -33,7 +39,11 @@ class Grid {
                 if (algorithm.isComputed(cell))
                     cell.draw(this.cellsize, computed);
                 else
-                    cell.draw(this.cellsize);
+                {
+                    color weightColor = color(122, 24, 24, map(cell.weight, MIN_WEIGHT, MAX_WEIGHT, 0, 180));
+                    cell.draw(this.cellsize, weightColor);
+                }
+                    
             }
         }
 
@@ -74,6 +84,11 @@ class Grid {
             return;
 
         cell.obstacle = false;
+
+        // Re-setup the algorithm, this could actually be improved
+        // i.e.: In A*, we could just remove start form gScore, fScore and pending, and add it again. No need to process all cells again.
+        this.algorithm.setup(this);
+
         this.start = cell;
     }
 

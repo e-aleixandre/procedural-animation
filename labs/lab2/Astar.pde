@@ -5,17 +5,20 @@
 class Astar implements Algorithm {
     Grid grid;
     PriorityQueue<Cell> pending;
-    HashSet<Cell> computed = new HashSet<Cell>();
+    HashSet<Cell> computed;
     HashMap<Cell, Float> gScore;
     HashMap<Cell, Float> fScore;
-    HashMap<Cell, Cell> cameFrom = new HashMap<Cell, Cell>();
+    HashMap<Cell, Cell> cameFrom;
     Heuristic heuristic;
-    Boolean solved = false;
+    Boolean solved;
     Cell lastChecked;
 
     void setup(Grid grid)
     {
         this.grid = grid;
+        this.solved = false;
+        this.computed = new HashSet<Cell>();
+        this.cameFrom = new HashMap<Cell, Cell>();
 
         // Using a custom comparator to order the PriorityQueue
         pending = new PriorityQueue<Cell>(new Comparator<Cell>() {
@@ -70,6 +73,7 @@ class Astar implements Algorithm {
             if (computed.contains(neighbour))
                 continue;
 
+            System.out.format("Neighbour weight: %f\n", neighbour.weight);
             float tentative_gScore = gScore.get(current) + neighbour.weight;       
 
             if (tentative_gScore < gScore.get(neighbour))
