@@ -34,7 +34,9 @@ function setup() {
   
   //spawnBoidsFromCircle(points, 250);
   //spawnBoidsFromBottom(points);
-  spawnBoidsRandomly(points);
+  //spawnBoidsRandomly(points);
+  //spawnBoidsFromCenter(points);
+  spawnBoidsFromSide(points, 500);
 
   fruitManager = new FruitManager();
   
