@@ -1,0 +1,11 @@
+# SPH parameters description file
+density=998.0
+visco=0.1
+stiff=3.0
+surften=1.0
+surften_threshold=1.0
+polymer=True
+polymer_k=1.0
+polymer_tau=2.0
+collision_restitution=0.6
+gravity=[0.0,0.0,-9.8]

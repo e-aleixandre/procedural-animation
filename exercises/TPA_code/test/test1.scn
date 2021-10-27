@@ -1,0 +1,12 @@
+# file for SPH scene description
+name=test1
+nparts=216
+fluid_volume=0.216
+kernel_parts=27
+tini=0.0
+tfin=1.0
+tstep=0.01
+fintol=0.001
+parallel=1
+nprocs=0
+gravity=[0.0,0.0,-9.8]
