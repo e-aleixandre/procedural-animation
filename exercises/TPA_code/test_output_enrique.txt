@@ -1,0 +1,51 @@
+Testing standard kernel
+------   Value      -------
+   ->  Ok!
+------   Gradient   -------
+   ->  Ok!
+------   Laplacian  -------
+   ->  Ok!
+
+Testing spiky kernel
+------   Value      -------
+   ->  Ok!
+-------  Gradient   -------
+   ->  Ok!
+-------  Laplacian  -------
+   ->  Ok!
+
+Testing viscosity kernel
+------   Value      -------
+   ->  Ok!
+-------  Gradient   -------
+   ->  Ok!
+-------  Laplacian  -------
+   ->  Ok!
+
+
+     SPH
+
+Building fluid...
+Cube built
+
+CONFIGURATION [build_fluid]:
+A volume of fluid with total volume: 1.0
+Viscosity: mu=0.1. Stiffness: k=3.0
+Surface tension: nu=1.0. Threshold: 1.0
+A cube of edge 1.0 has been built
+particles per edge: 3 at a distance 1.0
+Density is 980 with total mass 1.0
+We have 27 particles with mass 0.037037037037037035
+With an smoothing length of 1.0, which should yield 35 neighbours (aprox)
+Grid building took 0.0s
+Density computation took 0.0s
+Pressure force computation took 0.0s
+Viscosity force computation took 0.0s
+Surface tension computation took 0.0s
+Forces computation took 0.0s
+Grid building took 0.0s
+Density computation took 0.0s
+Pressure force computation took 0.0s
+Viscosity force computation took 0.0s
+Surface tension computation took 0.0s
+Forces computation took 0.0s
