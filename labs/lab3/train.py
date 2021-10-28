@@ -1,5 +1,6 @@
 import gym
 import numpy as np
+import matplotlib.pyplot as plt
 
 env = gym.make('FrozenLake8x8-v1', is_slippery=False)
 
@@ -32,5 +33,9 @@ for i in range(episodes):
         rev_list.append(rAll)
         
 np.savetxt("Q_table.txt", Q)
+
+plt.plot(rev_list)
+plt.show()
+
 
 env.close()
