@@ -62,7 +62,7 @@ test_kernel("std_values",std_values,my_std_values)
 print("------   Gradient   -------")
 test_kernel("std_grads",std_grads,my_std_grads)
 print("------   Laplacian  -------")
-test_kernel("std_values",std_lapl,my_std_lapl)
+test_kernel("std_laplacian",std_lapl,my_std_lapl)
 
 
 print("\nTesting spiky kernel")
@@ -71,7 +71,7 @@ test_kernel("spiky_values",spiky_values,my_spiky_values)
 print("-------  Gradient   -------")
 test_kernel("spiky_grads",spiky_grads,my_spiky_grads)
 print("-------  Laplacian  -------")
-test_kernel("spiky_values",spiky_lapl,my_spiky_lapl)
+test_kernel("spiky_laplacian",spiky_lapl,my_spiky_lapl)
 
 
 print("\nTesting viscosity kernel")
@@ -80,7 +80,7 @@ test_kernel("visco_values",visco_values,my_visco_values)
 print("-------  Gradient   -------")
 test_kernel("visco_grads",visco_grads,my_visco_grads)
 print("-------  Laplacian  -------")
-test_kernel("visco_values",visco_lapl,my_visco_lapl)
+test_kernel("visco_laplacian",visco_lapl,my_visco_lapl)
 
 
 
@@ -90,12 +90,29 @@ test_kernel("visco_values",visco_lapl,my_visco_lapl)
 print("\n\n     SPH\n")
 
 fluid = sph.SPHSystem()
-# n,dx,dens,mass,sm_len
-fluid.build_fluid(ppedge=3,edge = 1.0,dens = 980, kernel_part=35)
 
-fluid.solve(0.01)
+fluid.build_fluid(ppedge=3,
+                    edge = 1.0,
+                    dens = 980,
+                    kernel_part = 35,
+                    visco = 0.1,
+                    surftens = 1.0)
+
+
+print("""
+  ==================================
+    PERFORMING STEP WITH dt=0.01
+  ==================================""")
 fluid.solve(0.01)
 
+print("""
+STEP COMPLETE!
+
+  ==================================
+    PERFORMING STEP WITH dt=0.01
+  ==================================""")
+fluid.solve(0.01)
+print("\nSTEP COMPLETE!")
 
 
 
