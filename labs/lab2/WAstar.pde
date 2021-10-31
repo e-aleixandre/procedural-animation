@@ -4,7 +4,7 @@
 import java.text.DecimalFormat;
 import java.math.RoundingMode;
 
-class Astar implements Algorithm {
+class WAstar implements Algorithm {
     Grid grid;
     PriorityQueue<Cell> pending;
     HashSet<Cell> computed;
@@ -52,10 +52,6 @@ class Astar implements Algorithm {
         df.setRoundingMode(RoundingMode.DOWN);
     }
 
-    void findNextPath() {
-
-    }
-
     void setHeuristic(Heuristic heuristic)
     {
         this.heuristic = heuristic;
@@ -90,7 +86,7 @@ class Astar implements Algorithm {
                 cameFrom.put(neighbour, current);
                 gScore.put(neighbour, tentative_gScore);
 
-                fScore.put(neighbour, tentative_gScore + heuristic.calculate(neighbour, this.grid.getGoal()));
+                fScore.put(neighbour, tentative_gScore + neighbour.weight * heuristic.calculate(neighbour, this.grid.getGoal()));
 
                 if (!pending.contains(neighbour))
                     pending.add(neighbour);
@@ -142,8 +138,17 @@ class Astar implements Algorithm {
         gScore.put(grid.getStart(), 0.0);
         fScore.put(grid.getStart(), heuristic.calculate(grid.getStart(), grid.getGoal()));
 
+        // Increment weight of current path cells
+        ArrayList<Cell> path = getPath();
+
+        for (Cell cell : path)
+        {
+            cell.weight *= 1.25;
+        }
+
+        // Keep pending (open list) with start node on top
         pending.add(grid.getStart());
-        
+
         // Clear other maps/sets
         cameFrom.clear();
         computed.clear();

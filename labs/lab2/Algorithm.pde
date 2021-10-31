@@ -19,4 +19,10 @@ interface Algorithm {
 
     // Should return computed path
     ArrayList<Cell> getPath();
+
+    // For debuggin purposes, should draw info on screen relevant to the given cell
+    void info(Cell cell);
+
+    // Should re-setup the algorithm to calculate a new path
+    void restart();
 }

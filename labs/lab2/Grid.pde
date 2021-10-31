@@ -11,25 +11,30 @@ class Grid {
     private int cellsize;
     boolean diagonalMovement = false;
 
-    Grid(int cols, int rows, int cellsize) {
+    Grid(int cols, int rows, int cellsize, boolean randomWeights) {
         this.cols = cols;
         this.rows = rows;
         this.cellsize = cellsize;
 
         this.cells = new Cell[cols][rows];
 
-        for (int i = 0; i < cols; ++i)
-            for (int j = 0; j < rows; ++j)
-            {
-                float weight = random(MIN_WEIGHT, MAX_WEIGHT);
-                cells[i][j] = new Cell(i, j, weight);
-            }
+        if (randomWeights)
+            for (int i = 0; i < cols; ++i)
+                for (int j = 0; j < rows; ++j)
+                {
+                    float weight = random(MIN_WEIGHT, MAX_WEIGHT);
+                    cells[i][j] = new Cell(i, j, cellsize, weight);
+                }
+        else
+            for (int i = 0; i < cols; ++i)
+                for (int j = 0; j < rows; ++j)
+                    cells[i][j] = new Cell(i, j, cellsize);
         
         start = cells[0][0];
         goal = cells[cols - 1][rows - 1];
     }
 
-    void draw() {
+    void draw(boolean info) {
         color computed = color(172, 172, 242);
 
         for (Cell[] col : this.cells)
@@ -37,13 +42,20 @@ class Grid {
             for (Cell cell : col)
             {
                 if (algorithm.isComputed(cell))
+                {
                     cell.draw(this.cellsize, computed);
+                }
                 else
                 {
                     color weightColor = color(122, 24, 24, map(cell.weight, MIN_WEIGHT, MAX_WEIGHT, 0, 180));
                     cell.draw(this.cellsize, weightColor);
                 }
-                    
+
+                if (info)
+                {
+                    fill(0);
+                    algorithm.info(cell);
+                }
             }
         }
 
@@ -205,6 +217,25 @@ class Grid {
             // Ugly code
             line(path.get(i).col * cellsize + cellsize/2, path.get(i).row * cellsize + cellsize/2, path.get(i + 1).col * cellsize + cellsize/2, path.get(i + 1).row * cellsize + cellsize/2);
         }
+    }
+
+    void solvePath() {
+        while (!algorithm.isSolved())
+        {
+            algorithm.iterate();
+        }
+    }
+
+    boolean isSolved() {
+        return algorithm.isSolved();
+    }
+
+    ArrayList<Cell> getPath() {
+        return algorithm.getPath();
+    }
+
+    void restart() {
+        algorithm.restart();
     }
 
     void allowDiagonal(boolean allow)
