@@ -138,15 +138,21 @@ class WAstar implements Algorithm {
         gScore.put(grid.getStart(), 0.0);
         fScore.put(grid.getStart(), heuristic.calculate(grid.getStart(), grid.getGoal()));
 
-        // Increment weight of current path cells
-        ArrayList<Cell> path = getPath();
-
-        for (Cell cell : path)
+        // Increment weight of current path cells, if solved
+        if (this.solved)
         {
-            cell.weight *= 1.25;
+            ArrayList<Cell> path = getPath();
+
+            for (Cell cell : path)
+            {
+                cell.weight *= 1.25;
+            }
+        } else {
+            // if not completed, clear the pending set
+            pending.clear();
         }
 
-        // Keep pending (open list) with start node on top
+        // Add start node on top of pending
         pending.add(grid.getStart());
 
         // Clear other maps/sets

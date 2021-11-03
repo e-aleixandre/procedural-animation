@@ -1,9 +1,10 @@
-final int cols = 5, rows = 5, cellsize = 25, timeBetweenSpawn = 600;
+int cols = 150, rows = 150, cellsize = 3, timeBetweenSpawn = 600, numtests, maxCols, maxRows, increment;
 int lastSpawn = 0;
 Grid grid;
 Algorithm algo;
 Heuristic heuristic;
 ArrayList<Boid> boids;
+PrintWriter output;
 
 // Fixing problems with processing handling dragging
 boolean holdingLeft = false, holdingRight = false,
@@ -15,17 +16,71 @@ void settings() {
 }
 
 void setup() {
+    mainSetup();
+    //testSetup();
+}
+
+void mainSetup() {
     grid = new Grid(cols, rows, cellsize, false);
-    heuristic = new Euclidean();
-    algo = new WAstar();
+    heuristic = new Manhattan();
+    algo = new Astar();
     algo.setHeuristic(heuristic);
     grid.setAlgorithm(algo);
-    grid.allowDiagonal(true);
+    grid.allowDiagonal(false);
     
     boids = new ArrayList<Boid>();
 }
 
+void testSetup() {
+    cols = 10;
+    rows = 10;
+    output = createWriter("results.txt");
+    numtests = 100;
+    maxCols = 200;
+    maxRows = 200;
+    increment = 10;
+    heuristic = new Manhattan();
+    algo = new Astar();
+    algo.setHeuristic(heuristic);
+}
+
 void draw() {
+    mainDraw();
+    //testDraw();
+}
+
+void testDraw() {
+    int currentTime;
+    int accumulatedTime = 0;
+    grid = new Grid(cols, rows, cellsize, false);
+    grid.setAlgorithm(algo);
+    System.out.format("Testing with a %dx%d grid\n", cols, rows);
+    for (int i = 0; i < numtests; ++i)
+    {
+        currentTime = millis();
+        
+        while(!grid.isSolved())
+            grid.iterate();
+        
+        accumulatedTime += millis() - currentTime;
+        grid.restart();
+    }
+
+    accumulatedTime /= numtests;
+    output.println(cols + "\t" + accumulatedTime);
+
+    cols += increment;
+    rows += increment;
+
+    if (cols > maxCols || rows > maxRows)
+    {
+        output.flush();
+        output.close();
+        exit();
+    }
+}
+
+void mainDraw() {
     // Filling the background
     background(220);
     

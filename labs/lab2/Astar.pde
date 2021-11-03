@@ -52,10 +52,6 @@ class Astar implements Algorithm {
         df.setRoundingMode(RoundingMode.DOWN);
     }
 
-    void findNextPath() {
-
-    }
-
     void setHeuristic(Heuristic heuristic)
     {
         this.heuristic = heuristic;
@@ -83,7 +79,7 @@ class Astar implements Algorithm {
             if (computed.contains(neighbour))
                 continue;
 
-            float tentative_gScore = gScore.get(current) + heuristic.calculate(current, neighbour);       
+            float tentative_gScore = gScore.get(current) + heuristic.calculate(current, neighbour);
 
             if (tentative_gScore < gScore.get(neighbour))
             {
@@ -91,7 +87,7 @@ class Astar implements Algorithm {
                 gScore.put(neighbour, tentative_gScore);
 
                 fScore.put(neighbour, tentative_gScore + heuristic.calculate(neighbour, this.grid.getGoal()));
-
+                
                 if (!pending.contains(neighbour))
                     pending.add(neighbour);
             }
@@ -142,6 +138,7 @@ class Astar implements Algorithm {
         gScore.put(grid.getStart(), 0.0);
         fScore.put(grid.getStart(), heuristic.calculate(grid.getStart(), grid.getGoal()));
 
+        pending.clear();
         pending.add(grid.getStart());
         
         // Clear other maps/sets
@@ -160,6 +157,7 @@ class Astar implements Algorithm {
     {
         textAlign(CENTER, CENTER);
         text(this.heuristic.calculate(cell, this.grid.getGoal()), cell.center.x, cell.center.y - 20);
+        
         if (this.gScore.get(cell) == Float.MAX_VALUE)
             text("inf", cell.center.x, cell.center.y - 10);
         else
