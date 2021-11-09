@@ -6,7 +6,9 @@ import argparse
 """
     Declarations
 """
+# Learning rate
 alpha = 0.1
+# Discount factor
 gamma = 0.95
 environment = "FrozenLake-v0"
 episodes = 5000
@@ -47,7 +49,7 @@ rev_list = []
 """
 
 for i in range(episodes):
-    s = env.reset()
+    state = env.reset()
     rAll = 0
     d = False
     j = 0
@@ -55,20 +57,20 @@ for i in range(episodes):
     while j < 99:
         j += 1
 
-        a = np.argmax(Q[s, :] + np.random.randn(1, env.action_space.n) * (1. / (i + 1)))
+        action = np.argmax(Q[state, :] + np.random.randn(1, env.action_space.n) * (1. / (i + 1)))
 
-        s1, r, d, _ = env.step(a)
+        new_state, reward, d, _ = env.step(action)
 
-        Q[s, a] = Q[s, a] + alpha * (r + gamma * np.max(Q[s1, :]) - Q[s, a])
-        rAll += r
-        s = s1
+        Q[state, action] = Q[state, action] + alpha * (reward + gamma * np.max(Q[new_state, :]) - Q[state, action])
+        rAll += reward
+        state = new_state
+
         if d:
             break
 
         rev_list.append(rAll)
 
 np.savetxt("Q_table.txt", Q)
-
 plt.plot(rev_list)
 plt.show()
 
