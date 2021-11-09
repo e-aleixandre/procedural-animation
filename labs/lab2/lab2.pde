@@ -1,4 +1,5 @@
-int cols = 150, rows = 150, cellsize = 3, timeBetweenSpawn = 600, numtests, maxCols, maxRows, increment;
+import java.util.*;
+int cols = 25, rows = 25, cellsize = 20, timeBetweenSpawn = 600, numtests, maxCols, maxRows, increment;
 int lastSpawn = 0;
 Grid grid;
 Algorithm algo;
@@ -22,8 +23,8 @@ void setup() {
 
 void mainSetup() {
     grid = new Grid(cols, rows, cellsize, false);
-    heuristic = new Manhattan();
-    algo = new Astar();
+    heuristic = new Chebyshev();
+    algo = new WAstar();
     algo.setHeuristic(heuristic);
     grid.setAlgorithm(algo);
     grid.allowDiagonal(false);
@@ -35,11 +36,11 @@ void testSetup() {
     cols = 10;
     rows = 10;
     output = createWriter("results.txt");
-    numtests = 100;
+    numtests = 1000;
     maxCols = 200;
     maxRows = 200;
     increment = 10;
-    heuristic = new Manhattan();
+    heuristic = new Chebyshev();
     algo = new Astar();
     algo.setHeuristic(heuristic);
 }
@@ -59,8 +60,7 @@ void testDraw() {
     {
         currentTime = millis();
         
-        while(!grid.isSolved())
-            grid.iterate();
+        grid.solvePath();
         
         accumulatedTime += millis() - currentTime;
         grid.restart();

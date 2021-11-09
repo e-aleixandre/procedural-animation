@@ -79,7 +79,7 @@ class WAstar implements Algorithm {
             if (computed.contains(neighbour))
                 continue;
 
-            float tentative_gScore = gScore.get(current) + heuristic.calculate(current, neighbour);       
+            float tentative_gScore = gScore.get(current) + heuristic.calculate(current, neighbour);
 
             if (tentative_gScore < gScore.get(neighbour))
             {
