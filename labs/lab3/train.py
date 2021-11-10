@@ -13,22 +13,23 @@ gamma = 0.95
 environment = "FrozenLake-v0"
 episodes = 5000
 steps = 100
+sarsa = False
 
 """
     Argument definition
 """
 parser = argparse.ArgumentParser()
+parser.add_argument("--sarsa", action="store_true", help="Change from Q-Learning to Sarsa")
 parser.add_argument("--alpha", "-a", help="Learning rate, default: 0.1")
 parser.add_argument("--gamma", "-g", help="Discount factor, default: 0.95")
 parser.add_argument("--episodes", "-e", help="Number of episodes, default: 5000")
 parser.add_argument("--steps", "-s", help="Steps per episode, default: 100")
-parser.add_argument("environment", help="OpenAI environment, default: OpenLake-v1")
+parser.add_argument("environment", help="OpenAI environment to load")
 
 """
     Argument parsing
 """
 args = parser.parse_args()
-
 alpha = alpha if args.alpha is None else float(args.alpha)
 gamma = gamma if args.gamma is None else float(args.gamma)
 environment = environment if args.environment is None else args.environment
