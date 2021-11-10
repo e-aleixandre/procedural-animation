@@ -18,11 +18,11 @@ steps = 100
     Argument definition
 """
 parser = argparse.ArgumentParser()
-parser.add_argument("--alpha", "-a")
-parser.add_argument("--gamma", "-g")
-parser.add_argument("--episodes", "-e")
-parser.add_argument("--steps", "-s")
-parser.add_argument("environment")
+parser.add_argument("--alpha", "-a", help="Learning rate, default: 0.1")
+parser.add_argument("--gamma", "-g", help="Discount factor, default: 0.95")
+parser.add_argument("--episodes", "-e", help="Number of episodes, default: 5000")
+parser.add_argument("--steps", "-s", help="Steps per episode, default: 100")
+parser.add_argument("environment", help="OpenAI environment, default: OpenLake-v1")
 
 """
     Argument parsing
