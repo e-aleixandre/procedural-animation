@@ -10,31 +10,38 @@ import argparse
 alpha = 0.1
 # Discount factor
 gamma = 0.95
-environment = "FrozenLake-v0"
+environment = "FrozenLake-v1"
 episodes = 5000
 steps = 100
 sarsa = False
+# Epsilon greedy strategy
+max_exploration_rate = 1
+min_exploration_rate = 0.01
+exploration_rate = max_exploration_rate
+exploration_decay_rate = 0.001
 
 """
     Argument definition
 """
 parser = argparse.ArgumentParser()
 parser.add_argument("--sarsa", action="store_true", help="Change from Q-Learning to Sarsa")
-parser.add_argument("--alpha", "-a", help="Learning rate, default: 0.1")
-parser.add_argument("--gamma", "-g", help="Discount factor, default: 0.95")
-parser.add_argument("--episodes", "-e", help="Number of episodes, default: 5000")
-parser.add_argument("--steps", "-s", help="Steps per episode, default: 100")
-parser.add_argument("environment", help="OpenAI environment to load")
+parser.add_argument("--alpha", "-a", help="Learning rate, default: 0.1", type=float)
+parser.add_argument("--gamma", "-g", help="Discount factor, default: 0.95", type=float)
+parser.add_argument("--episodes", "-e", help="Number of episodes, default: 5000", type=int)
+parser.add_argument("--steps", "-s", help="Steps per episode, default: 100", type=int)
+parser.add_argument("environment", help="OpenAI environment to load", type=str)
+parser.add_argument("--decay-rate", "-o", help="Exploration decay rate, default: 0.001", type=float)
 
 """
     Argument parsing
 """
 args = parser.parse_args()
-alpha = alpha if args.alpha is None else float(args.alpha)
-gamma = gamma if args.gamma is None else float(args.gamma)
+alpha = alpha if args.alpha is None else args.alpha
+gamma = gamma if args.gamma is None else args.gamma
 environment = environment if args.environment is None else args.environment
-episodes = episodes if args.episodes is None else int(args.episodes)
-steps = steps if args.steps is None else int(args.steps)
+episodes = episodes if args.episodes is None else args.episodes
+steps = steps if args.steps is None else args.steps
+exploration_decay_rate = exploration_decay_rate if args.decay_rate is None else args.decay_rate
 
 """
     Initialization
@@ -51,25 +58,34 @@ rev_list = []
 
 for i in range(episodes):
     state = env.reset()
-    rAll = 0
-    d = False
-    j = 0
+    rewards = 0
+    done = False
 
-    while j < 99:
-        j += 1
+    for j in range(steps):
+        """
+            Decide between exploration and explotation
+        """
+        exploration_threshold = np.random.random()
 
-        action = np.argmax(Q[state, :] + np.random.randn(1, env.action_space.n) * (1. / (i + 1)))
+        if exploration_threshold > exploration_rate:
+            action = np.argmax(Q[state, :])
+        else:
+            action = env.action_space.sample()
 
-        new_state, reward, d, _ = env.step(action)
+        """
+            Perform the action, get results
+        """
+        new_state, reward, done, _ = env.step(action)
 
-        Q[state, action] = Q[state, action] + alpha * (reward + gamma * np.max(Q[new_state, :]) - Q[state, action])
-        rAll += reward
+        Q[state, action] = \
+            (1 - alpha) * Q[state, action] + alpha * (reward + gamma * np.max(Q[new_state, :]) - Q[state, action])
+        rewards += reward
         state = new_state
 
-        if d:
+        if done:
             break
 
-        rev_list.append(rAll)
+        rev_list.append(rewards)
 
 np.savetxt("Q_table.txt", Q)
 plt.plot(rev_list)
