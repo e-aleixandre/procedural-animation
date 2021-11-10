@@ -8,12 +8,15 @@ import argparse
 """
 # Learning rate
 alpha = 0.1
+
 # Discount factor
 gamma = 0.95
+
 environment = "FrozenLake-v1"
 episodes = 5000
 steps = 100
 sarsa = False
+
 # Epsilon greedy strategy
 max_exploration_rate = 1
 min_exploration_rate = 0.01
@@ -55,15 +58,15 @@ rev_list = []
 """
     Q-Learning
 """
+rewards = 0
 
 for i in range(episodes):
     state = env.reset()
-    rewards = 0
     done = False
 
     for j in range(steps):
         """
-            Decide between exploration and explotation
+            Decide between exploration and exploitation
         """
         exploration_threshold = np.random.random()
 
@@ -78,16 +81,36 @@ for i in range(episodes):
         new_state, reward, done, _ = env.step(action)
 
         Q[state, action] = \
-            (1 - alpha) * Q[state, action] + alpha * (reward + gamma * np.max(Q[new_state, :]) - Q[state, action])
+            (1 - alpha) * Q[state, action] + alpha * (reward + gamma * np.max(Q[new_state, :]))
         rewards += reward
         state = new_state
 
+        """
+            End the current episode if environment is over
+        """
         if done:
             break
 
-        rev_list.append(rewards)
+    """
+        After each episode, decrease the exploration rate to move towards exploitation
+    """
+    exploration_rate = \
+        min_exploration_rate + (max_exploration_rate - min_exploration_rate) * np.exp(-exploration_decay_rate * i)
 
+    """
+        And add the episode rewards to the list of rewards
+    """
+    rev_list.append(rewards)
+
+"""
+    Export Q table to test the agent elsewhere
+"""
 np.savetxt("Q_table.txt", Q)
+
+"""
+    Plot the results
+"""
+
 plt.plot(rev_list)
 plt.show()
 
