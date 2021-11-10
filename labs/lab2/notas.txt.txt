@@ -1,0 +1,2 @@
+Lanzar A*, encontrar primer camino
+- Mantener lista abierta! y lanzar otra vez
