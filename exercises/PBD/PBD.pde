@@ -7,7 +7,7 @@ boolean debug = false;
 
 PBDSystem system;
 
-float dt = 0.005;
+float dt = 1.0 / 60;
 
 PVector vel_viento= new PVector(0,0,0);
 
@@ -22,7 +22,7 @@ int n_ancho_tela = 10;
 int n_alto_tela = 10;
 float densidad_tela = 0.1; // kg/m^2 Podría ser tela gruesa de algodón, 100g/m^2
 float sphere_size_tela = ancho_tela/n_ancho_tela*0.4;
-float stiffness = 0.95;
+float stiffness = 0.5;
 
 
 void setup(){
@@ -43,7 +43,7 @@ void setup(){
                       stiffness,
                       sphere_size_tela);
                       
-  system.set_n_iters(10);
+  system.set_n_iters(100);
   
 }
 

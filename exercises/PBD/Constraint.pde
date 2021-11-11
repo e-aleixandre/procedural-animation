@@ -61,8 +61,8 @@ class DistanceConstraint extends Constraint{
 
     PVector delta = PVector.mult(n, 1.0 / (w1 + w2) * (d_act - this.d)); // en la diapositiva 25, delta es toda la parte común de ambas fórmulas
 
-    part1.location.add(PVector.mult(delta, -w1));
-    part2.location.add(PVector.mult(delta, w2));
+    part1.location.add(PVector.mult(delta, -w1 * this.k_coef));
+    part2.location.add(PVector.mult(delta, w2 * this.k_coef));
     
   }
   
